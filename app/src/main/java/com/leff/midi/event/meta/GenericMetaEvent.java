@@ -1,9 +1,9 @@
 package com.leff.midi.event.meta;
 
+import com.leff.midi.event.MidiEvent;
+
 import java.io.IOException;
 import java.io.OutputStream;
-
-import com.leff.midi.event.MidiEvent;
 
 public class GenericMetaEvent extends MetaEvent
 {

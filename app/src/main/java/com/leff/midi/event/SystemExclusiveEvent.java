@@ -16,10 +16,10 @@
 
 package com.leff.midi.event;
 
+import com.leff.midi.util.VariableLengthInt;
+
 import java.io.IOException;
 import java.io.OutputStream;
-
-import com.leff.midi.util.VariableLengthInt;
 
 /**
  * Full Disclosure, SysEx events may not be properly handled by this library.

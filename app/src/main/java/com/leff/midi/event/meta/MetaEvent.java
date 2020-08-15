@@ -16,12 +16,12 @@
 
 package com.leff.midi.event.meta;
 
+import com.leff.midi.event.MidiEvent;
+import com.leff.midi.util.VariableLengthInt;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import com.leff.midi.event.MidiEvent;
-import com.leff.midi.util.VariableLengthInt;
 
 public abstract class MetaEvent extends MidiEvent
 {

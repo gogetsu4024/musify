@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/background">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="449dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <Button
+                android:id="@+id/button1"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:onClick="record"
+                android:background="@drawable/recordgrey" />
+
+            <TextView
+                android:id="@+id/timer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:text="0:00"
+                android:textColor="@color/white" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="100dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <it.beppi.knoblibrary.Knob
+                android:id="@+id/midiKnob"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                app:kAnimationBounciness="20"
+                app:kAnimationSpeed="10"
+                app:kBalloonValuesAnimation="fade"
+                app:kBalloonValuesRelativePosition="0.25"
+                app:kBalloonValuesTextSize="4sp"
+                app:kBorderWidth="0dp"
+                app:kCircularIndicatorColor="@color/green_a200"
+                app:kCircularIndicatorRelativePosition="0.55"
+                app:kCircularIndicatorRelativeRadius="0.03"
+                app:kDefaultState="10"
+                app:kFreeRotation="false"
+                app:kIndicatorWidth="0dp"
+                app:kKnobDrawable="@drawable/knob3"
+                app:kKnobDrawableRotates="false"
+                app:kMaxAngle="120"
+                app:kMinAngle="-120"
+                app:kNumberOfStates="22"
+                app:kSelectedStateMarkerColor="@color/green_a200"
+                app:kSelectedStateMarkerContinuous="true"
+                app:kShowBalloonValues="true"
+                app:kStateMarkersAccentColor="@color/grey_800"
+                app:kStateMarkersAccentPeriodicity="5"
+                app:kStateMarkersAccentRelativeLength="0.09"
+                app:kStateMarkersAccentWidth="2dp"
+                app:kStateMarkersColor="@color/grey_800"
+                app:kStateMarkersRelativeLength="0.08"
+                app:kStateMarkersWidth="1dp"
+                app:kSwipe="vertical"
+                app:kSwipeSensitivityPixels="15" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:lines="2"
+                android:text="Volume knob / Vertical"
+                tools:layout_editor_absoluteX="629dp"
+                tools:layout_editor_absoluteY="64dp" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/instrument"
+            android:layout_width="49dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="36dp"
+            android:onClick="InstrumentDialog"
+            android:background="@drawable/instrumentchange"
+            app:layout_constraintEnd_toStartOf="@+id/linearLayout"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:padding="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        <Button
+            android:id="@+id/iv_left_arrow"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/left_arrow"
+            android:layout_marginEnd="15dp"
+            android:layout_marginStart="0dp"
+            />
+
+        <SeekBar
+            android:background="@drawable/piano_bar"
+            android:id="@+id/sb"
+            android:progressDrawable="@null"
+            android:thumb="@drawable/seekbar_thumb"
+            android:padding="0dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            />
+
+        <Button
+            android:id="@+id/iv_right_arrow"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/right_arrow"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="15dp"
+            />
+        <Button
+            android:id="@+id/iv_music"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/music"
+            />
+    </LinearLayout>
+
+    <com.chengtao.pianoview.view.PianoView
+        android:id="@+id/pv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+    </com.chengtao.pianoview.view.PianoView>
+</LinearLayout>

@@ -10,8 +10,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
-import android.os.Message;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -56,17 +54,10 @@ public class PianoView extends View {
   private OnLoadAudioListener loadAudioListener;
   private OnPianoListener pianoListener;
   private int progress;
-  private boolean canPress;
   private boolean isAutoPlaying;
   private boolean isInitFinish;
   private int minRange;
   private int maxRange;
-  private Handler autoPlayHandler;
-  private static final int HANDLE_AUTO_PLAY_START = 0;
-  private static final int HANDLE_AUTO_PLAY_END = 1;
-  private static final int HANDLE_AUTO_PLAY_BLACK_DOWN = 2;
-  private static final int HANDLE_AUTO_PLAY_WHITE_DOWN = 3;
-  private static final int HANDLE_AUTO_PLAY_KEY_UP = 4;
   private MidiSoundController midiSoundController;
 
   public PianoView(Context context) {
@@ -79,14 +70,13 @@ public class PianoView extends View {
 
   public PianoView(Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
-    this.midiSoundController = new MidiSoundController(getContext());
+    this.midiSoundController = new MidiSoundController();
     this.piano = null;
     this.pressedKeys = new CopyOnWriteArrayList();
     this.pianoColors = new String[]{"#C0C0C0", "#A52A2A", "#FF8C00", "#FFFF00", "#00FA9A", "#00CED1", "#4169E1", "#FFB6C1", "#FFEBCD"};
     this.layoutWidth = 0;
     this.scale = 1.0F;
     this.progress = 0;
-    this.canPress = true;
     this.isAutoPlaying = false;
     this.isInitFinish = false;
     this.minRange = 0;
@@ -130,12 +120,19 @@ public class PianoView extends View {
     public void onReceive(Context context, Intent intent) {
       // Get extra data included in the Intent
       boolean record = intent.getBooleanExtra("Record",false);
+      String path = intent.getStringExtra("Path");
+      int channel = intent.getIntExtra("channel",0);
       Toast.makeText(context,"Recording"+record ,Toast.LENGTH_SHORT).show();
-      if (record)
-        midiSoundController.startRecording();
+      if (record) {
+        try {
+          midiSoundController.startRecording(path,channel);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
       else {
         try {
-          float length =midiSoundController.stopRecording();
+          float length =midiSoundController.stopRecording(path);
           Toast.makeText(context,"length "+length ,Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
           e.printStackTrace();
@@ -224,9 +221,7 @@ public class PianoView extends View {
   }
 
   public boolean onTouchEvent(MotionEvent event) {
-    if (!this.canPress) {
-      return false;
-    } else {
+
       switch(event.getAction()) {
         case 0:
           this.handleDown(event.getActionIndex(), event);
@@ -257,7 +252,6 @@ public class PianoView extends View {
 
       return true;
     }
-  }
 
   public boolean performClick() {
     return super.performClick();
@@ -416,9 +410,6 @@ public class PianoView extends View {
 
   }
 
-  public void setCanPress(boolean canPress) {
-    this.canPress = canPress;
-  }
 
   public void scroll(int progress) {
     int x;
@@ -454,43 +445,7 @@ public class PianoView extends View {
     return Math.round((float)dp * (displayMetrics.xdpi / 160.0F));
   }
 
-  private void handleAutoPlay(Message msg) {
-    PianoKey key;
-    switch(msg.what) {
-      case 0:
-        break;
-      case 1:
-        this.isAutoPlaying = false;
-        this.setCanPress(true);
 
-        break;
-      case 2:
-        if (msg.obj != null) {
-          try {
-            key = (PianoKey)msg.obj;
-            this.autoScroll(key);
-            this.handleBlackKeyDown(-1, (MotionEvent)null, key);
-          } catch (Exception var4) {
-            Log.e("TAG", "黑键对象有问题:" + var4.getMessage());
-          }
-        }
-        break;
-      case 3:
-        if (msg.obj != null) {
-          try {
-            key = (PianoKey)msg.obj;
-            this.autoScroll(key);
-            this.handleWhiteKeyDown(-1, (MotionEvent)null, key);
-          } catch (Exception var3) {
-            Log.e("TAG", "白键对象有问题:" + var3.getMessage());
-          }
-        }
-        break;
-      case 4:
-        this.handleUp();
-    }
-
-  }
 
   private void autoScroll(PianoKey key) {
     if (this.isAutoPlaying && key != null) {
@@ -526,5 +481,11 @@ public class PianoView extends View {
     this.postDelayed(() -> {
       this.scroll(this.progress);
     }, 200L);
+  }
+  public void pause(){
+    midiSoundController.stopMidi();
+  }
+  public void resume(){
+    midiSoundController.startMidi();
   }
 }

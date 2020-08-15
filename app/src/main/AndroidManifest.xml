@@ -2,26 +2,34 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.bassemgharbi.androidpiano">
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".PianoActivity">
+        <activity android:screenOrientation="landscape" android:name=".Drums.view.ui.DrumsActivity">
 
         </activity>
-        <activity android:name=".Menu.MenuActivity">
+        <activity android:name=".ChooseMidiToRecord.ChooseMidiToRecordActivity" />
+        <activity
+            android:name=".recording.view.ui.StartRecordActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".recording.view.ui.RecordActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".improv.view.ui.PianoActivity"
+            android:screenOrientation="landscape" />
+        <activity android:name=".Menu.view.ui.MenuActivity" android:configChanges="screenSize|orientation|screenLayout|navigation">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
 
         </activity>
     </application>

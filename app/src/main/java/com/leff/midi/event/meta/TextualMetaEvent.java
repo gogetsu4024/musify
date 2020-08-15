@@ -16,11 +16,11 @@
 
 package com.leff.midi.event.meta;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 import com.leff.midi.event.MidiEvent;
 import com.leff.midi.util.VariableLengthInt;
+
+import java.io.IOException;
+import java.io.OutputStream;
 
 public abstract class TextualMetaEvent extends MetaEvent
 {

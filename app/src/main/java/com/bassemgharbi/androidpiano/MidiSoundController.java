@@ -1,24 +1,10 @@
 package com.bassemgharbi.androidpiano;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.content.res.AssetFileDescriptor;
-import android.content.res.AssetManager;
-import android.content.res.Resources;
-import android.media.AudioFormat;
-import android.media.AudioManager;
-import android.media.AudioTrack;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Environment;
 import android.os.SystemClock;
 import android.util.Log;
 import android.util.SparseArray;
-import android.media.midi.*;
-
-
-import androidx.core.app.ActivityCompat;
 
 import com.leff.midi.MidiFile;
 import com.leff.midi.MidiTrack;
@@ -26,32 +12,29 @@ import com.leff.midi.event.MidiEvent;
 import com.leff.midi.event.NoteOff;
 import com.leff.midi.event.NoteOn;
 import com.leff.midi.event.ProgramChange;
-import com.leff.midi.event.SystemExclusiveEvent;
 import com.leff.midi.event.meta.Tempo;
 import com.leff.midi.event.meta.TimeSignature;
 
 import org.billthefarmer.mididriver.MidiDriver;
+
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 
 public class MidiSoundController implements MidiDriver.OnMidiStartListener {
 
 
 
-    private Context context;
     protected MidiDriver midi;
     protected MediaPlayer player;
     private static final SparseArray<Integer> SOUND_MAP = new SparseArray<>();
     private static final SparseArray<Integer> POSITION_TO_NOTES = new SparseArray<>();
     private static final HashMap<String,Integer> POSITION_TO_NOTES2 = new HashMap<>();
     private int VOLUME = 60;
-
+    private int currentInstrument=0;
     public int getVOLUME() {
         return VOLUME;
     }
@@ -63,7 +46,9 @@ public class MidiSoundController implements MidiDriver.OnMidiStartListener {
     private boolean recording;
     private MidiTrack noteTrack,tempoTrack;
     private List<MidiTrack> tracks;
+    private MidiFile midiFile;
     private long startedAt;
+    private int channel=-1;
 
     static {
         POSITION_TO_NOTES.put(1, 60);
@@ -101,23 +86,36 @@ public class MidiSoundController implements MidiDriver.OnMidiStartListener {
         POSITION_TO_NOTES2.put("SI",12);
     }
 
-    public MidiSoundController(Context context) {
+    public MidiSoundController() {
         midi = new MidiDriver();
-        this.context = context;
         if (midi != null)
             midi.setOnMidiStartListener(this);
         midi.start();
     }
+    public void stopMidi(){
+        midi.stop();
+    }
+    public void startMidi(){
+        midi.start();
+    }
+
+    public void playNote(int note,int channel) {
+        sendMidi(0x90,note,VOLUME,channel);
+    }
+    public void stopNote(int note,int channel){
+        sendMidi(0x80,note,VOLUME,channel);
+    }
+
 
     public void playNote2(String note,int octave,int half) {
 
         int actualMidiNote = 11+POSITION_TO_NOTES2.get(note)+ half + (12*octave);
-         sendMidi(0x90, actualMidiNote, VOLUME);
-        SOUND_MAP.put(actualMidiNote,actualMidiNote);
+        sendMidi(0x90, actualMidiNote, VOLUME,0);
+        //SOUND_MAP.put(actualMidiNote,actualMidiNote);
         if (recording) {
             if (startedAt == 0)
                 startedAt = getCurrentTicks() - 4 * MidiFile.DEFAULT_RESOLUTION;
-            noteTrack.insertEvent(new NoteOn(getCurrentTicks() - startedAt, 0, actualMidiNote, 100));
+            noteTrack.insertEvent(new NoteOn(getCurrentTicks() - startedAt, channel, actualMidiNote, VOLUME));
         }
 
     }
@@ -125,36 +123,13 @@ public class MidiSoundController implements MidiDriver.OnMidiStartListener {
     public void stopNote2(String note,int octave,int half ) {
         int actualMidiNote = 11+POSITION_TO_NOTES2.get(note)+ half + 12*octave;
 
-        sendMidi(0x80, actualMidiNote, 0);
-        SOUND_MAP.remove(actualMidiNote);
+        sendMidi(0x80, actualMidiNote, 0,0);
+        //SOUND_MAP.remove(actualMidiNote);
         if (recording)
         {
-            noteTrack.insertEvent(new NoteOff(getCurrentTicks() - startedAt, 0, POSITION_TO_NOTES.get(actualMidiNote), 0));
+            noteTrack.insertEvent(new NoteOff(getCurrentTicks() - startedAt, channel, actualMidiNote, 0));
         }
     }
-
-    public void playNote(int note) {
-        sendMidi(0x90, POSITION_TO_NOTES.get(note), VOLUME);
-        SOUND_MAP.put(note,note);
-        if (recording) {
-            if (startedAt == 0)
-                startedAt = getCurrentTicks() - 4 * MidiFile.DEFAULT_RESOLUTION;
-            noteTrack.insertEvent(new NoteOn(getCurrentTicks() - startedAt, 0, POSITION_TO_NOTES.get(note), 100));
-        }
-
-
-    }
-
-    public void stopNote(int note) {
-        sendMidi(0x80, POSITION_TO_NOTES.get(note), 0);
-        SOUND_MAP.remove(note);
-        if (recording)
-        {
-            noteTrack.insertEvent(new NoteOff(getCurrentTicks() - startedAt, 0, POSITION_TO_NOTES.get(note), 0));
-        }
-    }
-
-
 
     @Override
     public void onMidiStart() {
@@ -174,6 +149,7 @@ public class MidiSoundController implements MidiDriver.OnMidiStartListener {
     }
     public void changeMidiInstrument(int instrument)
     {
+        currentInstrument=instrument;
         byte msg[] = new byte[2];
 
         msg[0] = (byte) 0xc0;
@@ -181,11 +157,11 @@ public class MidiSoundController implements MidiDriver.OnMidiStartListener {
 
         midi.write(msg);
     }
-    protected void sendMidi(int m, int n, int v)
+    protected void sendMidi(int m, int n, int v,int channel)
     {
         byte msg[] = new byte[3];
 
-        msg[0] = (byte) m;
+        msg[0] = (byte) ((byte) m|channel);
         msg[1] = (byte) n;
         msg[2] = (byte) v;
 
@@ -195,25 +171,52 @@ public class MidiSoundController implements MidiDriver.OnMidiStartListener {
         return SOUND_MAP.get(note)!=null;
     }
 
-    public void startRecording() {
-        recording = true;
-        tracks = new ArrayList<>();
+    public void startRecording(String path,int channel) throws IOException {
+        this.channel=channel;
+        File input =  input = new File(path);
+        midiFile = new MidiFile(input);
+        tracks = midiFile.getTracks();
+        Tempo tempo=null;
+        for (int i=0;i<tracks.size();i++) {
+            Iterator<MidiEvent> it = tracks.get(i).getEvents().iterator();
+            while(it.hasNext())
+            {
+                MidiEvent event = it.next();
+                if(event instanceof Tempo)
+                {
+                    tempo = (Tempo)event;
+
+                }
+            }
+        }
+        if (tempo==null){
+
+            tempoTrack = new MidiTrack();
+
+            TimeSignature ts = new TimeSignature();
+            ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER, TimeSignature.DEFAULT_DIVISION);
+            Tempo t = new Tempo();
+            t.setBpm(120);
+            tempoTrack.insertEvent(ts);
+            tempoTrack.insertEvent(t);
+            midiFile.addTrack(tempoTrack);
+        }
         noteTrack = new MidiTrack();
-        tempoTrack = new MidiTrack();
-
-        TimeSignature ts = new TimeSignature();
-        ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER, TimeSignature.DEFAULT_DIVISION);
-        Tempo t = new Tempo();
-        t.setBpm(120);
-        tempoTrack.insertEvent(ts);
-        tempoTrack.insertEvent(t);
-
-        tracks.add(tempoTrack);
-
-        noteTrack.insertEvent(new ProgramChange(0, 0, ProgramChange.MidiProgram.FLUTE.programNumber()));
-        noteTrack.insertEvent(new NoteOff(4 * MidiFile.DEFAULT_RESOLUTION, 0, 1, 0));
-
+        noteTrack.insertEvent(new ProgramChange(0, channel, currentInstrument));
+        // noteTrack.insertEvent(new NoteOff(4 * MidiFile.DEFAULT_RESOLUTION, 0, 1, 0));
+        recording = true;
         startedAt = 0;
+    }
+
+
+    public long stopRecording(String path) throws IOException {
+        midiFile.addTrack(noteTrack);
+        recording = false;
+        File output = new File(path);
+        midiFile.writeToFile(output);
+        Log.d("channel","channel is "+channel);
+        return midiFile.getLengthInTicks();
+
     }
     public void setBpm(int bpm) {
         Tempo t = new Tempo();
@@ -221,17 +224,6 @@ public class MidiSoundController implements MidiDriver.OnMidiStartListener {
         if (recording)
             tempoTrack.insertEvent(t);
     }
-
-    public long stopRecording() throws IOException {
-        tracks.add(noteTrack);
-        recording = false;
-        File output = new File(Environment.getExternalStorageDirectory().getPath()+"/test1.mid");
-        MidiFile midi = new MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks);
-        midi.writeToFile(output);
-        return midi.getLengthInTicks();
-
-    }
-
     private long getCurrentTicks() {
         return SystemClock.uptimeMillis();
     }

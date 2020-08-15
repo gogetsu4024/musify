@@ -1,14 +1,14 @@
 package com.leff.midi.examples;
 
-import java.io.File;
-import java.io.IOException;
-
 import com.leff.midi.MidiFile;
 import com.leff.midi.event.MidiEvent;
 import com.leff.midi.event.NoteOn;
 import com.leff.midi.event.meta.Tempo;
 import com.leff.midi.util.MidiEventListener;
 import com.leff.midi.util.MidiProcessor;
+
+import java.io.File;
+import java.io.IOException;
 
 public class EventPrinter implements MidiEventListener
 {

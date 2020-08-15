@@ -16,14 +16,6 @@
 
 package com.leff.midi;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Method;
-import java.util.Iterator;
-import java.util.TreeSet;
-
 import com.leff.midi.event.MidiEvent;
 import com.leff.midi.event.NoteOn;
 import com.leff.midi.event.meta.EndOfTrack;
@@ -31,6 +23,14 @@ import com.leff.midi.event.meta.Tempo;
 import com.leff.midi.event.meta.TimeSignature;
 import com.leff.midi.util.MidiUtil;
 import com.leff.midi.util.VariableLengthInt;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Method;
+import java.util.Iterator;
+import java.util.TreeSet;
 
 public class MidiTrack
 {

@@ -5,29 +5,46 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Menu.MenuActivity">
+    tools:context=".Menu.view.ui.MenuActivity">
 
     <androidx.viewpager.widget.ViewPager
-        android:foregroundGravity="center"
         android:id="@+id/viewPager"
-        android:layout_centerInParent="true"
-        android:overScrollMode="never"
-        android:clipToPadding="false"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:clipToPadding="false"
+        android:foregroundGravity="center"
+        android:overScrollMode="never">
+
     </androidx.viewpager.widget.ViewPager>
 
-    <Button
-        android:id="@+id/btnOrder"
-        android:text="Order Now!"
-        android:textColor="#fff"
-        android:background="@drawable/round"
-        android:paddingLeft="30dp"
-        android:paddingRight="30dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="60dp"
-        android:layout_centerHorizontal="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/musify"
+        android:layout_width="match_parent"
+        android:layout_height="109dp"
+        android:layout_marginTop="30dp">
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="296dp"
+            android:layout_height="94dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/musify3" />
+
+        <TextView
+            android:id="@+id/Musify"
+            android:layout_width="192dp"
+            android:layout_height="56dp"
+            android:layout_marginEnd="18dp"
+            android:text="Musify"
+            android:textColor="@color/CornflowerBlue"
+            android:textSize="36sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:layout_conversion_absoluteHeight="54dp"
+            tools:layout_conversion_absoluteWidth="131dp" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </RelativeLayout>

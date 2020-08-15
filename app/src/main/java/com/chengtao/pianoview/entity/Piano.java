@@ -7,7 +7,6 @@ import android.graphics.drawable.ScaleDrawable;
 
 import androidx.core.content.ContextCompat;
 
-
 import com.bassemgharbi.androidpiano.R;
 import com.google.gson.annotations.SerializedName;
 
