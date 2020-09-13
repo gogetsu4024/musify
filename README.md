@@ -27,7 +27,7 @@
 3. run the app
 
 ## Project images
-![BackOffice1](/readmeimages/Capture.PNG.png)
+![BackOffice1](/readmeimages/Capture.PNG)
 ![BackOffice2](/readmeimages/Capture1.PNG)
 ![BackOffice3](/readmeimages/Capture2.PNG)
 ![BackOffice4](/readmeimages/Capture3.PNG)
